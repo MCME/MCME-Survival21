@@ -1,0 +1,4 @@
+name: MCME Survival21
+version: ${project.version}
+main: com.mcmiddleearth.mcmesurvival21.MCMESurvival21
+api-version: 1.16
