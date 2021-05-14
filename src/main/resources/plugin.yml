@@ -2,3 +2,13 @@ name: MCME Survival21
 version: ${project.version}
 main: com.mcmiddleearth.mcmesurvival21.MCMESurvival21
 api-version: 1.16
+
+commands:
+  survival:
+    description: Survival management
+    usage: /survival
+
+permissions:
+  survival.manager:
+    description: allows to manage survival
+    default: op
