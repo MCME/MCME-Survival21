@@ -28,6 +28,7 @@ import java.util.zip.GZIPOutputStream;
 public class Outpost implements IStoragePlot {
 
     private final String name;
+    private String owner;
 
     private final Location location;
     private final int chunkX, chunkZ;
@@ -37,12 +38,19 @@ public class Outpost implements IStoragePlot {
     private final static int radius = 5;
     private final static int radiusSquared = radius * radius;
 
-    private final static int updateInterval = 10;  //ticks
+    private final static int updateInterval = 25;  //ticks
 
     private final static PotionEffect outpostEffect = new PotionEffect(PotionEffectType.REGENERATION, updateInterval,1,true,true,true);
 
     private final static File outpostFolder = new File(MCMESurvival21.getPlugin(MCMESurvival21.class).getDataFolder(),"outposts");
     private final File file;
+    private final static String fileExtension = ".out";
+
+    static {
+        if(!outpostFolder.exists()) {
+            outpostFolder.mkdirs();
+        }
+    }
 
     public Outpost(Location location) {
         name = ""+System.currentTimeMillis();
@@ -51,13 +59,16 @@ public class Outpost implements IStoragePlot {
         location.getBlock().getRelative(BlockFace.UP).setType(Material.WHITE_STAINED_GLASS);
         chunkX = location.getChunk().getX();
         chunkZ = location.getChunk().getZ();
-        file = new File(outpostFolder,name);
+        file = new File(outpostFolder,name+fileExtension);
+        owner = "neutral";
         new BukkitRunnable() {
             public void run() {
                 saveTerrain("neutral");
             }
         }.runTaskLater(MCMESurvival21.getPlugin(MCMESurvival21.class),1);
     }
+
+    public File getFile() { return file; }
 
     public Location getLocation() {
         return location;
@@ -111,10 +122,14 @@ public class Outpost implements IStoragePlot {
         if(!(location.getBlock().getState() instanceof Beacon)) {
             location.getBlock().setType(Material.BEACON);
         }
-        pasteTerrain((team!=null?team.getName():"neutral"));
-        location.getBlock().getRelative(BlockFace.UP).setType((team==null?Material.WHITE_STAINED_GLASS:team.getBeaconMaterial()));
+        String newOwner = (team!=null?team.getName():"neutral");
+        if(!newOwner.equals(owner)) {
+            owner = newOwner;
+            pasteTerrain(owner);
+            location.getBlock().getRelative(BlockFace.UP).setType((team==null?Material.WHITE_STAINED_GLASS:team.getBeaconMaterial()));
+        }
         inside.forEach(player -> {
-            if(team != null && team.getMembers().contains(player)) {
+            if(team != null && team.getMembers().contains(player.getUniqueId())) {
                 player.addPotionEffect(outpostEffect);
             }
         });
@@ -170,7 +185,7 @@ public class Outpost implements IStoragePlot {
                     new BufferedInputStream(
                             new GZIPInputStream(
                                     new ByteArrayInputStream(nbtData))))) {
-                new MCMEPlotFormat().load(null, in);
+                new MCMEPlotFormat().load(this, in);
             } catch (IOException | InvalidRestoreDataException ex) {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
             }
@@ -221,7 +236,7 @@ public class Outpost implements IStoragePlot {
             ByteArrayOutputStream byteOut = new ByteArrayOutputStream()
         ) {
             this.file = file;
-            this.name = file.getName();
+            this.name = file.getName().substring(0,file.getName().lastIndexOf('.'));
             location = readLocation(inStream);
             chunkX = location.getChunk().getX();
             chunkZ = location.getChunk().getZ();

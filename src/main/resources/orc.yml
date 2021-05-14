@@ -1,0 +1,10 @@
+spawn:
+  world: survival
+  x: 8.5
+  y: 28.0
+  z: -10036.5
+  pitch: 45.0
+  yaw: 30.0
+color: RED
+beaconMaterial: RED_STAINED_GLASS
+members: []

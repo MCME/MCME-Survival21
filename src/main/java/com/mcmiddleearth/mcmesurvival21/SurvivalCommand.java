@@ -29,20 +29,20 @@ public class SurvivalCommand extends AbstractCommandHandler implements TabExecut
         commandNodeBuilder
             .requires(sender -> ((SurvivalCommandSender)sender).hasPermission("survival.manager"))
             .then(HelpfulLiteralBuilder.literal("outpost")
-                .requires(sender -> ((SurvivalCommandSender)sender).isPlayer()))
+                .requires(sender -> ((SurvivalCommandSender)sender).isPlayer())
                 .then(HelpfulLiteralBuilder.literal("create")
                     .executes(context -> OutpostManager.createOutpost(context.getSource())))
                 .then(HelpfulLiteralBuilder.literal("remove")
-                    .executes(context -> OutpostManager.removeOutpost(context.getSource()))
+                    .executes(context -> OutpostManager.removeOutpost(context.getSource())))
                 .then(HelpfulLiteralBuilder.literal("save")
                     .then(HelpfulRequiredArgumentBuilder.argument("team", word())
                         .executes(context -> OutpostManager.saveTerrain(context.getSource(),
-                                                            context.getArgument("team", String.class)))))
+                                                            context.getArgument("team", String.class))))))
             .then(HelpfulLiteralBuilder.literal("protection")
                     .then(HelpfulLiteralBuilder.literal("enable")
                             .executes(context -> WorldGuardBridge.setProtection(context.getSource(), true)))
                     .then(HelpfulLiteralBuilder.literal("disable")
-                            .executes(context -> WorldGuardBridge.setProtection(context.getSource(), false)))));
+                            .executes(context -> WorldGuardBridge.setProtection(context.getSource(), false))));
         return commandNodeBuilder;
     }
 

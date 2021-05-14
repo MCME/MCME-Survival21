@@ -1,31 +1,43 @@
 package com.mcmiddleearth.mcmesurvival21.team;
 
-import com.mojang.brigadier.Command;
-import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
+import com.mcmiddleearth.mcmesurvival21.MCMESurvival21;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-
-import java.util.Random;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 public class TeamListener implements Listener {
 
-    CommandDispatcher<Player> dispatcher = new CommandDispatcher<>();
+//    CommandDispatcher<Player> dispatcher = new CommandDispatcher<>();
 
-    private static org.bukkit.scoreboard.Team Human;
-    private static org.bukkit.scoreboard.Team Elf;
-    private static org.bukkit.scoreboard.Team Dwarf;
-    private static org.bukkit.scoreboard.Team Orc;
-
-    private String messageString = "";
+    //private String messageString = "";
 
     @EventHandler
-    public void OnPlayerJoin(PlayerJoinEvent e){
+    public void onPlayerJoin(PlayerJoinEvent e) {
+        Player player = e.getPlayer();
+        Team team = TeamManager.getTeam(player);
+        if (team == null && !player.hasPermission("survival.exempt")) {
+            team = TeamManager.getRandomTeam();
+            team.add(player);
+            player.teleport(team.getSpawn());
+        }
+        if(team != null) {
+            team.getScoreboardTeam().addEntry(player.getName());
+            player.addAttachment(MCMESurvival21.getPlugin(MCMESurvival21.class), "venturechat."+team.getName()+"channel", true);
+            player.setBedSpawnLocation(team.getSpawn(), true);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent e) {
+        Player player = e.getPlayer();
+        Team team = TeamManager.getTeam(player);
+        if (team != null) {
+            team.getScoreboardTeam().removeEntry(player.getName());
+        }
+    }
+    /*
         if(!TeamManager.getHumanMembers().contains(e.getPlayer())&&!TeamManager.getElfMembers().contains(e.getPlayer())
                 &&!TeamManager.getDwarfMembers().contains(e.getPlayer())&&!TeamManager.getOrcMembers().contains(e.getPlayer())){
             Random num = new Random();
@@ -155,7 +167,7 @@ public class TeamListener implements Listener {
             return false;
         }
 
-    }
+    }*/
 
 }
 

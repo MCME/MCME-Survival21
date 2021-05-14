@@ -60,6 +60,7 @@ public class OutpostManager {
         }
         if(removal != null) {
             outposts.remove(removal);
+            removal.getFile().delete();
             sender.sendMessage(new ComponentBuilder("Outpost removed!").color(ChatColor.GREEN).create());
         } else {
             sender.sendMessage(new ComponentBuilder("No outpost in range!").color(ChatColor.RED).create());
