@@ -82,7 +82,7 @@
         <dependency>
             <groupId>com.mcmiddleearth</groupId>
             <artifactId>PluginUtils</artifactId>
-            <version>1.4.0</version>
+            <version>1.4.3</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.bukkit</groupId>

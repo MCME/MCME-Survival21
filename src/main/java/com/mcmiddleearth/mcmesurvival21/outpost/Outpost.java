@@ -55,8 +55,7 @@ public class Outpost implements IStoragePlot {
     public Outpost(Location location) {
         name = ""+System.currentTimeMillis();
         this.location = location;
-        location.getBlock().setType(Material.BEACON);
-        location.getBlock().getRelative(BlockFace.UP).setType(Material.WHITE_STAINED_GLASS);
+        setBlocks();
         chunkX = location.getChunk().getX();
         chunkZ = location.getChunk().getZ();
         file = new File(outpostFolder,name+fileExtension);
@@ -118,15 +117,26 @@ public class Outpost implements IStoragePlot {
         }
     }
 
+    private void setBlocks() {
+        location.getBlock().setType(Material.BEACON);
+        location.getBlock().getRelative(BlockFace.UP).setType(Material.WHITE_STAINED_GLASS);
+        for(int i = -1; i<=1; i++) {
+            for (int j=-1; j<=1; j++) {
+                location.getBlock().getRelative(i,-1,j).setType(Material.IRON_BLOCK);
+            }
+        }
+    }
+
     private void setOwner(Team team, Collection<Player> inside) {
         if(!(location.getBlock().getState() instanceof Beacon)) {
-            location.getBlock().setType(Material.BEACON);
+            //location.getBlock().setType(Material.BEACON);
+            setBlocks();
         }
         String newOwner = (team!=null?team.getName():"neutral");
+        location.getBlock().getRelative(BlockFace.UP).setType((team==null?Material.WHITE_STAINED_GLASS:team.getBeaconMaterial()));
         if(!newOwner.equals(owner)) {
             owner = newOwner;
             pasteTerrain(owner);
-            location.getBlock().getRelative(BlockFace.UP).setType((team==null?Material.WHITE_STAINED_GLASS:team.getBeaconMaterial()));
         }
         inside.forEach(player -> {
             if(team != null && team.getMembers().contains(player.getUniqueId())) {
