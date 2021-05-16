@@ -1,4 +1,19 @@
-name: MCME Survival21
+name: ${project.artifactId}
 version: ${project.version}
 main: com.mcmiddleearth.mcmesurvival21.MCMESurvival21
+depend: [WorldGuard]
 api-version: 1.16
+
+commands:
+  survival:
+    description: Survival management
+    usage: /survival
+
+permissions:
+  survival.manager:
+    description: allows to manage survival
+    default: op
+    children:
+      survival.exempt: true
+  survival.exempt:
+    description: excludes a player from being added to a survival team
