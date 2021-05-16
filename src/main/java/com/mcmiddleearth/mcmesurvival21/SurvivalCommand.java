@@ -38,6 +38,11 @@ public class SurvivalCommand extends AbstractCommandHandler implements TabExecut
                     .then(HelpfulRequiredArgumentBuilder.argument("team", word())
                         .executes(context -> OutpostManager.saveTerrain(context.getSource(),
                                                             context.getArgument("team", String.class))))))
+            .then(HelpfulLiteralBuilder.literal("warp")
+                .requires(sender ->((SurvivalCommandSender)sender).isPlayer())
+                .then(HelpfulRequiredArgumentBuilder.argument("team",word())
+                    .executes(context -> TeamManager.warpToBase(context.getSource(),
+                                         context.getArgument("team", String.class)))))
             .then(HelpfulLiteralBuilder.literal("protection")
                     .then(HelpfulLiteralBuilder.literal("enable")
                             .executes(context -> WorldGuardBridge.setProtection(context.getSource(), true)))

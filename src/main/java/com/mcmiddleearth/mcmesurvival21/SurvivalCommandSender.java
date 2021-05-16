@@ -6,8 +6,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.logging.Logger;
-
 public class SurvivalCommandSender implements McmeCommandSender {
 
     private CommandSender sender;
@@ -27,7 +25,6 @@ public class SurvivalCommandSender implements McmeCommandSender {
     }
 
     public boolean isPlayer() {
-        Logger.getGlobal().info("commandSender: "+sender.getName()+" "+(sender instanceof Player));
         return sender instanceof Player;
     }
 

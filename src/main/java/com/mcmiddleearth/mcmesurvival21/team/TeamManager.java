@@ -1,5 +1,9 @@
 package com.mcmiddleearth.mcmesurvival21.team;
 
+import com.mcmiddleearth.command.McmeCommandSender;
+import com.mcmiddleearth.mcmesurvival21.SurvivalCommandSender;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
@@ -13,38 +17,19 @@ public class TeamManager {
 
     private final static Map<String, Team> teams = new HashMap<>();
 
-    private final static Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+    private final static Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 
     private final static Random random = new Random();
 
     public static void init() {
-        //teams.put("human",new Team("human",Material.BLUE_STAINED_GLASS, scoreboard));
-        //teams.put("elf",new Team("elf",Material.GREEN_STAINED_GLASS, scoreboard));
-        //teams.put("dwarf",new Team("dwarf",Material.RED_STAINED_GLASS, scoreboard));
-        //teams.put("orc",new Team("orc",Material.BLACK_STAINED_GLASS, scoreboard));
         for(File file: Team.getTeamFolder().listFiles()) {
             try {
-                teams.put(file.getName(), new Team(file, scoreboard));
+                teams.put(file.getName().substring(0,file.getName().lastIndexOf('.')), new Team(file, scoreboard));
             } catch (IOException | InvalidConfigurationException e) {
                 e.printStackTrace();
             }
         }
     }
-
-    /*public static ArrayList<Player> getOnlineHumanMembers() { return getOnlineMembers("human"); }
-
-    public static ArrayList<Player> getOnlineElfMembers() {
-        return getOnlineMembers("elf");
-    }
-
-    public static ArrayList<Player> getOnlineDwarfMembers() {
-        return getOnlineMembers("dwarf");
-    }
-
-    public static ArrayList<Player> getOnlineOrcMembers() {
-        return getOnlineMembers("orc");
-    }*/
-
 
     public static ArrayList<Player> getOnlineMembers(String team) {
         ArrayList<Player> result = new ArrayList<>();
@@ -94,5 +79,17 @@ public class TeamManager {
 
     public static Set<String> getTeamNames() {
         return teams.keySet();
+    }
+
+    public static int warpToBase(McmeCommandSender sender, String teamName) {
+        Player player = ((SurvivalCommandSender)sender).getPlayer();
+        Team team = teams.get(teamName);
+        if(team != null) {
+            player.teleport(team.getSpawn());
+            sender.sendMessage(new ComponentBuilder("Teleported to "+teamName+" base!").color(ChatColor.GREEN).create());
+        } else {
+            sender.sendMessage(new ComponentBuilder("Team not found!").color(ChatColor.RED).create());
+        }
+        return 0;
     }
 }

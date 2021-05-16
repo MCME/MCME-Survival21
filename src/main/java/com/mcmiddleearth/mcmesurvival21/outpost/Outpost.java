@@ -242,8 +242,7 @@ public class Outpost implements IStoragePlot {
     public Outpost(File file) throws IOException {
         try(DataInputStream inStream = new DataInputStream(
                 new BufferedInputStream(
-                        new FileInputStream(file)));
-            ByteArrayOutputStream byteOut = new ByteArrayOutputStream()
+                        new FileInputStream(file)))
         ) {
             this.file = file;
             this.name = file.getName().substring(0,file.getName().lastIndexOf('.'));
@@ -259,14 +258,16 @@ public class Outpost implements IStoragePlot {
                 int read;
                 int left = terrainSize;
                 byte[] buffer = new byte[inc];
-                do {
-                    read = inStream.read(buffer,0,Math.min(inc,left));
-                    if (read > 0) {
-                        byteOut.write(buffer, 0, read);
-                    }
-                    left -= read;
-                } while (left > 0);
-                terrain.put(team,byteOut.toByteArray());
+                try(ByteArrayOutputStream byteOut = new ByteArrayOutputStream()) {
+                    do {
+                        read = inStream.read(buffer, 0, Math.min(inc, left));
+                        if (read > 0) {
+                            byteOut.write(buffer, 0, read);
+                        }
+                        left -= read;
+                    } while (left > 0);
+                    terrain.put(team, byteOut.toByteArray());
+                }
             }
             location.getBlock().setType(Material.BEACON);
             location.getBlock().getRelative(BlockFace.UP).setType(Material.WHITE_STAINED_GLASS);

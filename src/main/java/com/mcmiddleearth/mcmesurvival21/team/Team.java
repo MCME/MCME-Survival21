@@ -1,6 +1,7 @@
 package com.mcmiddleearth.mcmesurvival21.team;
 
 import com.mcmiddleearth.mcmesurvival21.MCMESurvival21;
+import com.mcmiddleearth.mcmesurvival21.WorldGuardBridge;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 public class Team {
 
@@ -45,6 +47,7 @@ public class Team {
     public Team(File file, Scoreboard scoreboard) throws IOException, InvalidConfigurationException {
         this.file = file;
         this.name = file.getName().substring(0,file.getName().lastIndexOf('.'));
+Logger.getLogger(Team.class.getSimpleName()).info("Filename: "+file.getName()+" name: "+name);
         YamlConfiguration config = new YamlConfiguration();
         config.load(file);
         try {
@@ -59,27 +62,18 @@ public class Team {
         }
         scoreboardTeam = scoreboard.registerNewTeam(name);
         scoreboardTeam.setPrefix(""+color);
+        scoreboardTeam.setOption(org.bukkit.scoreboard.Team.Option.NAME_TAG_VISIBILITY, org.bukkit.scoreboard.Team.OptionStatus.ALWAYS);
         scoreboardTeam.setColor(color);
         ConfigurationSection section = config.getConfigurationSection("spawn");
             spawn = new Location(Bukkit.getWorld(section.getString("world","survival")),
                                 section.getDouble("x",0),
                                 section.getDouble("y",100),
                                 section.getDouble("z",0),
-                                (float) section.getDouble("pitch",0),
-                                (float) section.getDouble("yaw",0));
+                                (float) section.getDouble("yaw",0),
+                                (float) section.getDouble("pitch",0));
         List<String> players = config.getStringList("members");
         players.forEach(player-> members.add(UUID.fromString(player)));
     }
-
-    /*public Team(String name, Location spawn, Material beaconMaterial, Scoreboard scoreboard) {
-        this.name = name;
-        this.spawn = spawn;
-        this.beaconMaterial = beaconMaterial;
-        scoreboardTeam = scoreboard.registerNewTeam(name);
-        scoreboardTeam.set
-        file = new File(teamFolder,name+fileExtension);
-        saveToFile();
-    }*/
 
     public static File getTeamFolder() {
         return teamFolder;
@@ -103,11 +97,13 @@ public class Team {
 
     public void add(Player player) {
         members.add(player.getUniqueId());
+        WorldGuardBridge.addPlayerToTeam(player, getName());
         saveToFile();
     }
 
     public void remove(Player player) {
         members.remove(player.getUniqueId());
+        WorldGuardBridge.removePlayerFromTeam(player, getName());
         saveToFile();
     }
 
